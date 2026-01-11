@@ -142,11 +142,10 @@ resource "aws_lb_listener" "http_listener" {
    }
  }
 
- resource "aws_lb_target_group_attachment" "eks_nodes" {
-   for_each = { for idx, id in data.aws_instances.eks_nodes.ids : id => id }
-
-   target_group_arn = aws_lb_target_group.eks_tg.arn
-   target_id        = each.value
-   port             = 30000
- }
+resource "aws_lb_target_group_attachment" "eks_nodes" {
+  count            = length(data.aws_instances.eks_nodes.ids)
+  target_group_arn = aws_lb_target_group.eks_tg.arn
+  target_id        = data.aws_instances.eks_nodes.ids[count.index]
+  port             = 30000
+}
 
